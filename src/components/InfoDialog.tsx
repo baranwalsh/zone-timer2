@@ -39,7 +39,7 @@ const InfoDialog: React.FC = () => {
               </Button>
             </DialogTrigger>
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent className="custom-tooltip">
             <p className="text-sm">How It Works</p>
           </TooltipContent>
         </Tooltip>
@@ -93,7 +93,7 @@ const InfoDialog: React.FC = () => {
           
           <div className="pt-4 border-t border-white/20 mt-4">
             <p className="text-white/70 text-right">
-              Made by Shagun Baranwal.
+              Made by <a href="https://modul.so/shagun" target="_blank" rel="noopener noreferrer" className="hover:text-white underline">Shagun Baranwal</a>.
             </p>
           </div>
         </div>

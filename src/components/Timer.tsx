@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, KeyboardEvent } from "react";
 import { useTimer } from "@/contexts/TimerContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,12 +36,42 @@ const Timer: React.FC = () => {
         title: "Break complete!",
         description: "Your break time is over. Ready to start working again?",
         className: "popup-blur text-white border-0",
+        duration: 3000, // Auto dismiss after 3 seconds
       });
     }
     
     // Update previous seconds for animation
     setPrevSeconds(seconds);
-  }, [seconds, mode, isRunning, breakTime, pauseTimer]);
+    
+    // Add global keyboard shortcuts
+    const handleKeyDown = (e: KeyboardEvent<Document>) => {
+      if (!isEditing) {
+        if (e.key === 's' || e.key === 'S') {
+          isRunning ? pauseTimer() : startTimer();
+        } else if (e.key === 'r' || e.key === 'R') {
+          resetTimer();
+        } else if (e.key === 't' || e.key === 'T') {
+          if (mode === 'work' && currentTask.trim()) {
+            if (totalWorkTime >= 60) {
+              switchToBreak();
+            } else {
+              toast({
+                title: "Work a bit longer",
+                description: "You should work for at least 1 minute before taking a break.",
+                className: "popup-blur text-white border-0",
+                duration: 3000,
+              });
+            }
+          } else if (mode === 'break') {
+            switchToWork();
+          }
+        }
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown as any);
+    return () => document.removeEventListener('keydown', handleKeyDown as any);
+  }, [seconds, mode, isRunning, breakTime, pauseTimer, isEditing, startTimer, resetTimer, switchToBreak, switchToWork, totalWorkTime, currentTask]);
 
   // Format time as MM:SS
   const formatTime = (timeInSeconds: number) => {
@@ -54,6 +84,12 @@ const Timer: React.FC = () => {
     setCurrentTask(taskInput);
     setIsEditing(false);
   };
+  
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSaveTask();
+    }
+  };
 
   // Prevent users from switching to break if they haven't worked enough
   const handleSwitchToBreak = () => {
@@ -62,6 +98,7 @@ const Timer: React.FC = () => {
         title: "Work a bit longer",
         description: "You should work for at least 1 minute before taking a break.",
         className: "popup-blur text-white border-0",
+        duration: 3000, // Auto dismiss after 3 seconds
       });
       return;
     }
@@ -69,7 +106,7 @@ const Timer: React.FC = () => {
   };
 
   const renderDigit = (digit: string, index: number, isBreakMode: boolean) => {
-    const animationClass = isBreakMode ? "break-digit-enter" : "digit-enter";
+    const animationClass = isBreakMode ? "break-digit-fade-in" : "digit-fade-in";
     return (
       <span key={`${index}-${digit}`} className={animationClass}>
         {digit}
@@ -86,6 +123,7 @@ const Timer: React.FC = () => {
             <Input
               value={taskInput}
               onChange={(e) => setTaskInput(e.target.value)}
+              onKeyDown={handleInputKeyDown}
               placeholder="What are you focusing on?"
               className="text-2xl md:text-3xl font-medium text-white bg-white/10 border-0 p-4 backdrop-blur-sm placeholder-white/70 rounded-2xl"
               autoFocus
@@ -117,7 +155,7 @@ const Timer: React.FC = () => {
           className={cn(
             "py-6 px-8 rounded-full text-lg font-medium transition-all duration-300",
             mode === "work" 
-              ? "bg-red-500/80 text-white shadow-lg scale-110 border-0" 
+              ? "bg-white/20 text-white shadow-lg scale-110 border-0" 
               : "bg-white/10 text-white hover:bg-white/20 border-0 hover:border-0 hover:text-white"
           )}
           onClick={switchToWork}
@@ -130,7 +168,7 @@ const Timer: React.FC = () => {
           className={cn(
             "py-6 px-8 rounded-full text-lg font-medium transition-all duration-300",
             mode === "break" 
-              ? "bg-blue-500/80 text-white shadow-lg scale-110 border-0" 
+              ? "bg-white/20 text-white shadow-lg scale-110 border-0" 
               : "bg-white/10 text-white hover:bg-white/20 border-0 hover:border-0 hover:text-white"
           )}
           onClick={handleSwitchToBreak}
@@ -179,8 +217,8 @@ const Timer: React.FC = () => {
                 </Button>
               )}
             </TooltipTrigger>
-            <TooltipContent>
-              {isRunning ? "Pause Timer" : "Start Timer"}
+            <TooltipContent className="custom-tooltip">
+              {isRunning ? "Pause Timer (S)" : "Start Timer (S)"}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -196,8 +234,8 @@ const Timer: React.FC = () => {
                   <SkipForward className="w-8 h-8" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
-                Take a Break
+              <TooltipContent className="custom-tooltip">
+                Take a Break (T)
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -213,8 +251,8 @@ const Timer: React.FC = () => {
                 <RefreshCw className="w-8 h-8" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>
-              Reset Timer
+            <TooltipContent className="custom-tooltip">
+              Reset Timer (R)
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

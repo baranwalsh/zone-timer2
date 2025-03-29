@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useTimer } from "@/contexts/TimerContext";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ const Settings: React.FC = () => {
         title: "Invalid divisor",
         description: "Divisor must be 1 or greater",
         className: "popup-blur text-white border-0",
+        duration: 3000, // Auto dismiss after 3 seconds
       });
       return;
     }
@@ -39,6 +41,7 @@ const Settings: React.FC = () => {
       title: "Settings saved",
       description: "Your changes have been applied",
       className: "popup-blur text-white border-0",
+      duration: 3000, // Auto dismiss after 3 seconds
     });
     setOpen(false);
   };
@@ -65,7 +68,7 @@ const Settings: React.FC = () => {
               </Button>
             </DialogTrigger>
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent className="custom-tooltip">
             <p className="text-sm">Settings</p>
           </TooltipContent>
         </Tooltip>
@@ -145,7 +148,7 @@ const Settings: React.FC = () => {
 
               <Button 
                 onClick={handleSave} 
-                className="w-full bg-white/20 hover:bg-white/30 text-white border-0 btn-hover rounded-xl"
+                className="w-full bg-white/20 text-white border-0 rounded-xl btn-carved"
               >
                 Save Changes
               </Button>

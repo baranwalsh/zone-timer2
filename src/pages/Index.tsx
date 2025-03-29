@@ -47,7 +47,10 @@ const TimerApp: React.FC = () => {
             : "neutral-gradient animated-gradient"
       )}
     >
-      <header className="w-full p-6 navbar-blur flex justify-between items-center z-10">
+      {/* Navbar shadow gradient */}
+      <div className="navbar-shadow"></div>
+      
+      <header className="w-full p-6 navbar-blur flex justify-between items-center z-10 relative">
         <Logo />
         <DateTime />
       </header>
@@ -56,7 +59,7 @@ const TimerApp: React.FC = () => {
         <Timer />
       </main>
 
-      <footer className="p-6 flex justify-between items-center">
+      <footer className="p-6 flex justify-between items-center z-10 relative">
         <div className="flex space-x-2">
           <InfoDialog />
           <ThemeSelector />
