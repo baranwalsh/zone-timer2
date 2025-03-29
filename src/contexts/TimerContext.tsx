@@ -90,13 +90,22 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, [isRunning, mode]);
 
+  // Custom toast function with auto-dismiss
+  const showToast = (title: string, description: string) => {
+    toast({
+      title,
+      description,
+      className: "popup-blur text-gray-800 border-0 cursor-pointer",
+      duration: 3000, // Auto dismiss after 3 seconds
+    });
+  };
+
   const startTimer = () => {
     if (currentTask.trim() === "" && mode === "idle") {
-      toast({
-        title: "Please enter a task",
-        description: "Enter what you're focusing on before starting the timer.",
-        className: "popup-blur text-white border-0",
-      });
+      showToast(
+        "Please enter a task",
+        "Enter what you're focusing on before starting the timer."
+      );
       return;
     }
     
@@ -126,11 +135,10 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const switchToBreak = () => {
     if (currentTask.trim() === "") {
-      toast({
-        title: "Please enter a task",
-        description: "Enter what you're focusing on before starting a break.",
-        className: "popup-blur text-white border-0",
-      });
+      showToast(
+        "Please enter a task",
+        "Enter what you're focusing on before starting a break."
+      );
       return;
     }
     
@@ -140,20 +148,18 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setMode("break");
     playSound("break");
     
-    toast({
-      title: "Break Time!",
-      description: `Take a ${Math.floor(calculatedBreakTime / 60)} minute break.`,
-      className: "popup-blur text-white border-0",
-    });
+    showToast(
+      "Break Time!",
+      `Take a ${Math.floor(calculatedBreakTime / 60)} minute break.`
+    );
   };
 
   const switchToWork = () => {
     if (currentTask.trim() === "") {
-      toast({
-        title: "Please enter a task",
-        description: "Enter what you're focusing on before starting work.",
-        className: "popup-blur text-white border-0",
-      });
+      showToast(
+        "Please enter a task",
+        "Enter what you're focusing on before starting work."
+      );
       return;
     }
     
@@ -163,11 +169,10 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setBreakTime(0);
     playSound("work");
 
-    toast({
-      title: "Back to Work!",
-      description: "Work session started. Focus on your task.",
-      className: "popup-blur text-white border-0",
-    });
+    showToast(
+      "Back to Work!",
+      "Work session started. Focus on your task."
+    );
   };
 
   return (

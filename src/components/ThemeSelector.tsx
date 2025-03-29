@@ -39,6 +39,7 @@ const ThemeSelector: React.FC = () => {
   const { playSound } = useTimer();
   const previewsRef = useRef<HTMLDivElement | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [animatingThemes, setAnimatingThemes] = useState<boolean>(false);
 
   useEffect(() => {
     // Auto hide previews when mouse leaves area
@@ -66,7 +67,20 @@ const ThemeSelector: React.FC = () => {
   }, [showPreviews, activeTheme]);
 
   const handleThemeToggle = () => {
-    setShowPreviews(!showPreviews);
+    if (showPreviews) {
+      // Start exit animation
+      setAnimatingThemes(true);
+      setTimeout(() => {
+        setShowPreviews(false);
+        setAnimatingThemes(false);
+      }, 300 * themes.length); // Give time for cascading animation
+    } else {
+      setShowPreviews(true);
+      setAnimatingThemes(true);
+      setTimeout(() => {
+        setAnimatingThemes(false);
+      }, 300 * themes.length); // Give time for cascading animation
+    }
     playSound("refresh");
   };
 
@@ -77,7 +91,16 @@ const ThemeSelector: React.FC = () => {
   };
 
   const handleThemeClose = () => {
-    setActiveTheme(null);
+    // Fade out the active theme
+    const themeEl = document.querySelector('.theme-iframe-container') as HTMLElement;
+    if (themeEl) {
+      themeEl.style.opacity = '0';
+      setTimeout(() => {
+        setActiveTheme(null);
+      }, 500);
+    } else {
+      setActiveTheme(null);
+    }
     playSound("refresh");
   };
 
@@ -124,19 +147,20 @@ const ThemeSelector: React.FC = () => {
       {showPreviews && !activeTheme && (
         <div 
           ref={previewsRef}
-          className="theme-previews absolute right-2 bottom-12 flex flex-col-reverse gap-2"
+          className="theme-previews absolute right-8 bottom-12 flex flex-col-reverse gap-2"
         >
           {themes.map((theme, index) => (
             <div 
               key={theme.id}
-              className="theme-preview cursor-pointer relative group"
+              className={`theme-preview cursor-pointer relative group ${animatingThemes ? (showPreviews ? 'theme-preview-enter' : 'theme-preview-exit') : ''}`}
               style={{
-                opacity: [0.25, 0.5, 0.8][index],
+                opacity: animatingThemes ? 0 : [0.25, 0.5, 0.8][index],
                 transform: `translateY(${index * -10}px)`,
                 zIndex: 10 - index,
                 height: "90px",
                 width: "160px",
-                transition: "opacity 0.3s ease-in-out"
+                transition: "opacity 0.3s ease-in-out",
+                animationDelay: `${index * 0.1}s`
               }}
             >
               <img 
@@ -159,7 +183,7 @@ const ThemeSelector: React.FC = () => {
       )}
 
       {activeTheme && (
-        <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="fixed inset-0 pointer-events-none z-0 theme-iframe-container theme-transition">
           <iframe 
             src={activeTheme.url} 
             className="w-full h-full" 

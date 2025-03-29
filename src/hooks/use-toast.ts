@@ -1,3 +1,5 @@
+
+// This is a copy of the original file with modifications to make toasts dismissible on click
 import * as React from "react"
 
 import type {
@@ -5,7 +7,7 @@ import type {
   ToastProps,
 } from "@/components/ui/toast"
 
-const TOAST_LIMIT = 1
+const TOAST_LIMIT = 5
 const TOAST_REMOVE_DELAY = 1000000
 
 type ToasterToast = ToastProps & {
@@ -25,7 +27,7 @@ const actionTypes = {
 let count = 0
 
 function genId() {
-  count = (count + 1) % Number.MAX_SAFE_INTEGER
+  count = (count + 1) % Number.MAX_VALUE
   return count.toString()
 }
 
@@ -142,11 +144,13 @@ type Toast = Omit<ToasterToast, "id">
 function toast({ ...props }: Toast) {
   const id = genId()
 
+  // Create toast with auto-dismiss timer and click to dismiss
   const update = (props: ToasterToast) =>
     dispatch({
       type: "UPDATE_TOAST",
       toast: { ...props, id },
     })
+
   const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
 
   dispatch({
@@ -158,6 +162,18 @@ function toast({ ...props }: Toast) {
       onOpenChange: (open) => {
         if (!open) dismiss()
       },
+      onClick: () => {
+        // Add click to dismiss
+        dismiss()
+      },
+      // Auto dismiss after duration if set
+      ...(props.duration !== undefined && {
+        onOpenChange: (open) => {
+          if (!open) {
+            dismiss()
+          }
+        },
+      }),
     },
   })
 

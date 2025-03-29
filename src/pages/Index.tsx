@@ -33,6 +33,31 @@ const TimerApp: React.FC = () => {
     if (navbar) {
       navbar.classList.add("navbar-slide-in");
     }
+    
+    // Cache media files
+    const cacheMedia = async () => {
+      try {
+        if ('caches' in window) {
+          const cache = await caches.open('zone-media');
+          const urls = [
+            'https://i.ibb.co/DfRFXYGY/09-orange-smooth-gradients-blur.png',
+            'https://i.ibb.co/yczhwzGX/29-diffuse-light-blue.jpg',
+            'https://i.ibb.co/zTvYrVtc/01-colorful-smooth-gradient.jpg',
+            'https://whyp.it/tracks/269053/work',
+            'https://whyp.it/tracks/269054/break',
+            'https://whyp.it/tracks/269055/refresh',
+            'https://i.ibb.co/TM70RnnZ/image.png',
+            'https://i.ibb.co/5yh9rYG/image-2025-03-29-144539849.png',
+            'https://i.ibb.co/27B4zDkW/image.png'
+          ];
+          await Promise.all(urls.map(url => cache.add(new Request(url))));
+        }
+      } catch (error) {
+        console.error('Failed to cache media:', error);
+      }
+    };
+    
+    cacheMedia();
   }, [playSound]);
 
   return (
@@ -63,6 +88,14 @@ const TimerApp: React.FC = () => {
         <div className="flex space-x-2">
           <InfoDialog />
           <ThemeSelector />
+          <a 
+            href="https://modul.so/shagun" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-white/70 hover:text-white text-sm ml-4 self-center transition-colors duration-300"
+          >
+            By Shagun Baranwal
+          </a>
         </div>
         <div className="flex space-x-2">
           <MusicPlayer />
