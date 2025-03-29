@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -86,29 +86,34 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Montserrat', sans-serif;
+    overflow: hidden;
   }
 }
 
 @layer components {
   /* Custom gradient backgrounds */
   .work-gradient {
-    background: linear-gradient(to bottom right, #b80000, #ea4c46, #f18f7c);
-    background-size: 200% 200%;
+    background-image: url('https://i.ibb.co/DfRFXYGY/09-orange-smooth-gradients-blur.png');
+    background-size: cover;
+    background-position: center;
   }
   
   .break-gradient {
-    background: linear-gradient(to bottom right, #003b73, #0074b7, #60a3d9);
-    background-size: 200% 200%;
+    background-image: url('https://i.ibb.co/yczhwzGX/29-diffuse-light-blue.jpg');
+    background-size: cover;
+    background-position: center;
   }
   
   .neutral-gradient {
-    background: linear-gradient(to bottom right, #b998f8, #cb99f8, #deaaff);
-    background-size: 200% 200%;
+    background-image: url('https://i.ibb.co/zTvYrVtc/01-colorful-smooth-gradient.jpg');
+    background-size: cover;
+    background-position: center;
   }
   
   /* Animated gradients */
   .animated-gradient {
-    animation: gradient-animation 10s ease infinite;
+    transition: background-image 1.5s ease-in-out;
   }
   
   /* Button effects */
@@ -118,9 +123,19 @@
 
   /* Navbar blur */
   .navbar-blur {
-    @apply backdrop-blur-md bg-white/10 border-b border-white/10 rounded-b-2xl;
+    @apply backdrop-blur-md bg-white/10 border-b border-white/10 rounded-b-3xl;
   }
 
+  /* Button with extra rounded corners */
+  .btn-extra-rounded {
+    @apply rounded-2xl;
+  }
+  
+  /* Popup blur background */
+  .popup-blur {
+    @apply bg-black/30 backdrop-blur-lg;
+  }
+  
   /* Timer number transition */
   .digit-enter {
     animation: digit-slide-up 0.3s ease-out forwards;
@@ -137,6 +152,24 @@
   
   .break-digit-exit {
     animation: digit-slide-up 0.3s ease-out forwards;
+  }
+  
+  /* Theme preview container */
+  .theme-previews {
+    @apply relative z-10;
+  }
+  
+  .theme-preview {
+    @apply rounded-xl border border-white/50 overflow-hidden transition-all duration-300 ease-in-out;
+  }
+  
+  .theme-preview:hover {
+    @apply border-white;
+  }
+  
+  /* Progress bar */
+  .break-progress-bar {
+    @apply fixed bottom-0 left-0 h-2 bg-white/20 transition-all duration-300;
   }
 }
 
@@ -174,6 +207,43 @@
   }
 }
 
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes morphing {
+  0% {
+    border-radius: 50%;
+    transform: scale(1);
+  }
+  50% {
+    border-radius: 16px;
+    transform: scale(1.05);
+  }
+  100% {
+    border-radius: 16px;
+    transform: scale(1);
+  }
+}
+
 .timer-container {
   width: 100%;
   height: 100vh;
@@ -183,6 +253,7 @@
 
 .btn-transition {
   transition: all 0.3s ease;
+  border-radius: 16px;
 }
 
 .btn-transition:hover {
@@ -191,6 +262,25 @@
 
 .btn-transition:active {
   transform: translateY(0px);
+}
+
+.navbar-slide-in {
+  animation: slide-down 0.6s ease-out forwards;
+}
+
+.cascade-fade-in > * {
+  opacity: 0;
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.cascade-fade-in > *:nth-child(1) { animation-delay: 0.1s; }
+.cascade-fade-in > *:nth-child(2) { animation-delay: 0.2s; }
+.cascade-fade-in > *:nth-child(3) { animation-delay: 0.3s; }
+.cascade-fade-in > *:nth-child(4) { animation-delay: 0.4s; }
+.cascade-fade-in > *:nth-child(5) { animation-delay: 0.5s; }
+
+.dialog-morphing {
+  animation: morphing 0.5s ease-out forwards;
 }
 
 /* Make input placeholder text white */

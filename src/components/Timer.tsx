@@ -35,6 +35,7 @@ const Timer: React.FC = () => {
       toast({
         title: "Break complete!",
         description: "Your break time is over. Ready to start working again?",
+        className: "popup-blur text-white border-0",
       });
     }
     
@@ -60,11 +61,20 @@ const Timer: React.FC = () => {
       toast({
         title: "Work a bit longer",
         description: "You should work for at least 1 minute before taking a break.",
-        variant: "destructive",
+        className: "popup-blur text-white border-0",
       });
       return;
     }
     switchToBreak();
+  };
+
+  const renderDigit = (digit: string, index: number, isBreakMode: boolean) => {
+    const animationClass = isBreakMode ? "break-digit-enter" : "digit-enter";
+    return (
+      <span key={`${index}-${digit}`} className={animationClass}>
+        {digit}
+      </span>
+    );
   };
 
   return (
@@ -77,19 +87,19 @@ const Timer: React.FC = () => {
               value={taskInput}
               onChange={(e) => setTaskInput(e.target.value)}
               placeholder="What are you focusing on?"
-              className="text-2xl md:text-3xl font-medium text-white bg-white/10 border-0 p-4 backdrop-blur-sm placeholder-white/70"
+              className="text-2xl md:text-3xl font-medium text-white bg-white/10 border-0 p-4 backdrop-blur-sm placeholder-white/70 rounded-2xl"
               autoFocus
             />
             <Button
               onClick={handleSaveTask}
-              className="bg-white/20 hover:bg-white/30 text-white border-0 p-4 h-12 btn-hover"
+              className="bg-white/20 hover:bg-white/30 text-white border-0 p-4 h-12 btn-hover rounded-2xl"
             >
               Save
             </Button>
           </div>
         ) : (
           <div 
-            className="group flex items-center justify-center cursor-pointer p-4 rounded-lg hover:bg-white/5 transition-all duration-300"
+            className="group flex items-center justify-center cursor-pointer p-4 rounded-2xl hover:bg-white/5 transition-all duration-300"
             onClick={() => setIsEditing(true)}
           >
             <h2 className="text-3xl md:text-4xl font-medium text-white text-center">
@@ -108,10 +118,10 @@ const Timer: React.FC = () => {
             "py-6 px-8 rounded-full text-lg font-medium transition-all duration-300",
             mode === "work" 
               ? "bg-red-500/80 text-white shadow-lg scale-110 border-0" 
-              : "bg-white/10 text-white hover:bg-white/20 border-0 hover:border-0"
+              : "bg-white/10 text-white hover:bg-white/20 border-0 hover:border-0 hover:text-white"
           )}
           onClick={switchToWork}
-          disabled={mode === "work"}
+          disabled={mode === "work" || !currentTask.trim()}
         >
           Work
         </Button>
@@ -121,10 +131,10 @@ const Timer: React.FC = () => {
             "py-6 px-8 rounded-full text-lg font-medium transition-all duration-300",
             mode === "break" 
               ? "bg-blue-500/80 text-white shadow-lg scale-110 border-0" 
-              : "bg-white/10 text-white hover:bg-white/20 border-0 hover:border-0"
+              : "bg-white/10 text-white hover:bg-white/20 border-0 hover:border-0 hover:text-white"
           )}
           onClick={handleSwitchToBreak}
-          disabled={mode === "break"}
+          disabled={mode === "break" || !currentTask.trim()}
         >
           Break
         </Button>
@@ -134,9 +144,9 @@ const Timer: React.FC = () => {
       <div className="w-full text-center mb-10">
         <div className="text-9xl font-bold tracking-tighter text-white">
           {mode === "work" 
-            ? formatTime(seconds) 
+            ? formatTime(seconds).split('').map((digit, i) => renderDigit(digit, i, false))
             : mode === "break" 
-              ? formatTime(breakTime > 0 ? Math.max(0, breakTime - seconds) : 0)
+              ? formatTime(breakTime > 0 ? Math.max(0, breakTime - seconds) : 0).split('').map((digit, i) => renderDigit(digit, i, true))
               : "00:00"
           }
         </div>

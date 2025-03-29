@@ -11,12 +11,21 @@ import {
 } from "@/components/ui/dialog";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useTimer } from "@/contexts/TimerContext";
 
 const InfoDialog: React.FC = () => {
   const [open, setOpen] = useState(false);
+  const { playSound } = useTimer();
+
+  const handleDialogOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    if (newOpen) {
+      playSound("refresh");
+    }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -31,12 +40,12 @@ const InfoDialog: React.FC = () => {
             </DialogTrigger>
           </TooltipTrigger>
           <TooltipContent>
-            How It Works
+            <p className="text-sm">How It Works</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
       
-      <DialogContent className="neutral-gradient text-white animate-fade-in backdrop-blur-lg border-0 max-w-3xl max-h-[80vh] overflow-auto">
+      <DialogContent className="neutral-gradient text-white animate-fade-in backdrop-blur-lg border-0 max-w-3xl max-h-[80vh] overflow-auto dialog-morphing">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">How It Works</DialogTitle>
           <DialogDescription className="text-white/80">
@@ -44,7 +53,7 @@ const InfoDialog: React.FC = () => {
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4 mt-4">
+        <div className="space-y-4 mt-4 cascade-fade-in">
           <div>
             <h3 className="text-lg font-medium mb-2">The Main Concept</h3>
             <p className="text-white/80">

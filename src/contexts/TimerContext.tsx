@@ -1,8 +1,9 @@
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { toast } from "@/components/ui/use-toast";
 
 type TimerMode = "work" | "break" | "idle";
+type SoundType = "work" | "break" | "refresh";
 
 interface TimerContextType {
   seconds: number;
@@ -21,6 +22,7 @@ interface TimerContextType {
   resetTimer: () => void;
   switchToBreak: () => void;
   switchToWork: () => void;
+  playSound: (type: SoundType) => void;
 }
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
@@ -34,6 +36,39 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [totalWorkTime, setTotalWorkTime] = useState<number>(0);
   const [breakTime, setBreakTime] = useState<number>(0);
   const [musicUrl, setMusicUrl] = useState<string>("");
+
+  const workSoundRef = useRef<HTMLAudioElement | null>(null);
+  const breakSoundRef = useRef<HTMLAudioElement | null>(null);
+  const refreshSoundRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    workSoundRef.current = new Audio("https://whyp.it/tracks/269053/work");
+    breakSoundRef.current = new Audio("https://whyp.it/tracks/269054/break");
+    refreshSoundRef.current = new Audio("https://whyp.it/tracks/269055/refresh");
+    
+    return () => {
+      workSoundRef.current = null;
+      breakSoundRef.current = null;
+      refreshSoundRef.current = null;
+    };
+  }, []);
+
+  const playSound = (type: SoundType) => {
+    try {
+      if (type === "work" && workSoundRef.current) {
+        workSoundRef.current.currentTime = 0;
+        workSoundRef.current.play();
+      } else if (type === "break" && breakSoundRef.current) {
+        breakSoundRef.current.currentTime = 0;
+        breakSoundRef.current.play();
+      } else if (type === "refresh" && refreshSoundRef.current) {
+        refreshSoundRef.current.currentTime = 0;
+        refreshSoundRef.current.play();
+      }
+    } catch (error) {
+      console.error("Error playing sound:", error);
+    }
+  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -60,17 +95,25 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       toast({
         title: "Please enter a task",
         description: "Enter what you're focusing on before starting the timer.",
-        variant: "destructive",
+        className: "popup-blur text-white border-0",
       });
       return;
     }
     
     setIsRunning(true);
-    if (mode === "idle") setMode("work");
+    if (mode === "idle") {
+      setMode("work");
+      playSound("work");
+    } else if (mode === "break") {
+      playSound("break");
+    }
   };
 
   const pauseTimer = () => {
     setIsRunning(false);
+    if (mode === "break") {
+      playSound("break");
+    }
   };
 
   const resetTimer = () => {
@@ -78,29 +121,52 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setSeconds(0);
     setMode("idle");
     setBreakTime(0);
+    playSound("refresh");
   };
 
   const switchToBreak = () => {
+    if (currentTask.trim() === "") {
+      toast({
+        title: "Please enter a task",
+        description: "Enter what you're focusing on before starting a break.",
+        className: "popup-blur text-white border-0",
+      });
+      return;
+    }
+    
     const calculatedBreakTime = Math.floor(totalWorkTime / divisor);
     setBreakTime(calculatedBreakTime);
     setSeconds(0);
     setMode("break");
+    playSound("break");
     
     toast({
       title: "Break Time!",
       description: `Take a ${Math.floor(calculatedBreakTime / 60)} minute break.`,
+      className: "popup-blur text-white border-0",
     });
   };
 
   const switchToWork = () => {
+    if (currentTask.trim() === "") {
+      toast({
+        title: "Please enter a task",
+        description: "Enter what you're focusing on before starting work.",
+        className: "popup-blur text-white border-0",
+      });
+      return;
+    }
+    
     setSeconds(0);
     setMode("work");
     setTotalWorkTime(0);
     setBreakTime(0);
+    playSound("work");
 
     toast({
       title: "Back to Work!",
       description: "Work session started. Focus on your task.",
+      className: "popup-blur text-white border-0",
     });
   };
 
@@ -123,6 +189,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         resetTimer,
         switchToBreak,
         switchToWork,
+        playSound,
       }}
     >
       {children}

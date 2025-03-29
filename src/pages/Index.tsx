@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { TimerProvider } from "@/contexts/TimerContext";
 import { useTimer } from "@/contexts/TimerContext";
 import Timer from "@/components/Timer";
@@ -7,6 +7,9 @@ import Settings from "@/components/Settings";
 import InfoDialog from "@/components/InfoDialog";
 import MusicPlayer from "@/components/MusicPlayer";
 import DateTime from "@/components/DateTime";
+import FullscreenButton from "@/components/FullscreenButton";
+import ThemeSelector from "@/components/ThemeSelector";
+import BreakProgressBar from "@/components/BreakProgressBar";
 import { cn } from "@/lib/utils";
 
 // Zone logo component
@@ -18,10 +21,23 @@ const Logo: React.FC = () => (
 
 // Inner content that uses the timer context
 const TimerApp: React.FC = () => {
-  const { mode } = useTimer();
+  const { mode, playSound } = useTimer();
+  const appRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Play refresh sound on page load
+    playSound("refresh");
+    
+    // Add navbar animation class after initial load
+    const navbar = document.querySelector("header");
+    if (navbar) {
+      navbar.classList.add("navbar-slide-in");
+    }
+  }, [playSound]);
 
   return (
     <div 
+      ref={appRef}
       className={cn(
         "timer-container transition-all duration-1000 flex flex-col animate-fade-in",
         mode === "work" 
@@ -36,17 +52,23 @@ const TimerApp: React.FC = () => {
         <DateTime />
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center p-6">
+      <main className="flex-1 flex flex-col items-center justify-center p-6 cascade-fade-in">
         <Timer />
       </main>
 
       <footer className="p-6 flex justify-between items-center">
-        <InfoDialog />
+        <div className="flex space-x-2">
+          <InfoDialog />
+          <ThemeSelector />
+        </div>
         <div className="flex space-x-2">
           <MusicPlayer />
           <Settings />
+          <FullscreenButton />
         </div>
       </footer>
+      
+      <BreakProgressBar />
     </div>
   );
 };
