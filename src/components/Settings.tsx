@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useTimer } from "@/contexts/TimerContext";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Settings as SettingsIcon, Tabs } from "lucide-react";
+import { Settings as SettingsIcon } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import MoodistEmbed from "./MoodistEmbed";
