@@ -90,28 +90,53 @@
 }
 
 @layer components {
-  /* Gradient backgrounds */
+  /* Custom gradient backgrounds */
   .work-gradient {
-    @apply bg-gradient-to-br from-red-600 via-red-500 to-pink-500 transition-all duration-1000;
+    background: linear-gradient(to bottom right, #b80000, #ea4c46, #f18f7c);
+    background-size: 200% 200%;
   }
   
   .break-gradient {
-    @apply bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-500 transition-all duration-1000;
+    background: linear-gradient(to bottom right, #003b73, #0074b7, #60a3d9);
+    background-size: 200% 200%;
   }
   
   .neutral-gradient {
-    @apply bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 transition-all duration-1000;
+    background: linear-gradient(to bottom right, #b998f8, #cb99f8, #deaaff);
+    background-size: 200% 200%;
   }
   
   /* Animated gradients */
   .animated-gradient {
-    background-size: 200% 200%;
     animation: gradient-animation 10s ease infinite;
   }
   
   /* Button effects */
   .btn-hover {
     @apply transition-all duration-300 hover:scale-105 active:scale-95;
+  }
+
+  /* Navbar blur */
+  .navbar-blur {
+    @apply backdrop-blur-md bg-white/10 border-b border-white/10 rounded-b-2xl;
+  }
+
+  /* Timer number transition */
+  .digit-enter {
+    animation: digit-slide-up 0.3s ease-out forwards;
+  }
+  
+  .digit-exit {
+    animation: digit-slide-down 0.3s ease-out forwards;
+  }
+  
+  /* Break mode number transition (opposite direction) */
+  .break-digit-enter {
+    animation: digit-slide-down 0.3s ease-out forwards;
+  }
+  
+  .break-digit-exit {
+    animation: digit-slide-up 0.3s ease-out forwards;
   }
 }
 
@@ -124,6 +149,28 @@
   }
   100% {
     background-position: 0% 50%;
+  }
+}
+
+@keyframes digit-slide-up {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes digit-slide-down {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20px);
+    opacity: 0;
   }
 }
 
@@ -144,4 +191,18 @@
 
 .btn-transition:active {
   transform: translateY(0px);
+}
+
+/* Make input placeholder text white */
+::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+::-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
 }

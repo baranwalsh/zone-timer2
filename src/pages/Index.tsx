@@ -9,10 +9,10 @@ import MusicPlayer from "@/components/MusicPlayer";
 import DateTime from "@/components/DateTime";
 import { cn } from "@/lib/utils";
 
-// Flocus logo component
+// Zone logo component
 const Logo: React.FC = () => (
   <div className="text-white text-4xl font-bold tracking-tight">
-    fl<span className="text-white/80">o</span>cus
+    <img src="/lovable-uploads/1e67c2cf-62b8-4e21-a652-aaec2976cbaf.png" alt="Zone" className="h-12" />
   </div>
 );
 
@@ -31,7 +31,7 @@ const TimerApp: React.FC = () => {
             : "neutral-gradient animated-gradient"
       )}
     >
-      <header className="w-full p-6 flex justify-between items-center">
+      <header className="w-full p-6 navbar-blur flex justify-between items-center z-10">
         <Logo />
         <DateTime />
       </header>

@@ -10,22 +10,33 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const InfoDialog: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="rounded-full p-2 btn-hover bg-white/10 backdrop-blur-sm text-white"
-        >
-          <Info className="w-5 h-5" />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="neutral-gradient text-white animate-fade-in backdrop-blur-lg border-0 max-w-lg">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full p-2 btn-hover bg-white/10 backdrop-blur-sm text-white"
+              >
+                <Info className="w-5 h-5" />
+              </Button>
+            </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>
+            How It Works
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      
+      <DialogContent className="neutral-gradient text-white animate-fade-in backdrop-blur-lg border-0 max-w-3xl max-h-[80vh] overflow-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">How It Works</DialogTitle>
           <DialogDescription className="text-white/80">
@@ -68,6 +79,12 @@ const InfoDialog: React.FC = () => {
           <div className="pt-2">
             <p className="text-white/90 italic">
               "What lasts long won't come easy"
+            </p>
+          </div>
+          
+          <div className="pt-4 border-t border-white/20 mt-4">
+            <p className="text-white/70 text-right">
+              Made by Shagun Baranwal.
             </p>
           </div>
         </div>
