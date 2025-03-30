@@ -87,7 +87,7 @@ const InfoDialog: React.FC = () => {
           
           <div className="pt-2">
             <p className="text-white/90 italic">
-              "What lasts long won't come easy"
+              "Time will pass regardless. Might as well lock in."
             </p>
           </div>
           

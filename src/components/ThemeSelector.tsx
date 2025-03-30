@@ -147,14 +147,15 @@ const ThemeSelector: React.FC = () => {
       {showPreviews && !activeTheme && (
         <div 
           ref={previewsRef}
-          className="theme-previews absolute right-8 bottom-12 flex flex-col-reverse gap-2"
+          className="theme-previews absolute right-0 bottom-12 flex flex-col-reverse gap-2"
+          style={{ right: '-30px' }}  // Move themes more to the right
         >
           {themes.map((theme, index) => (
             <div 
               key={theme.id}
               className={`theme-preview cursor-pointer relative group ${animatingThemes ? (showPreviews ? 'theme-preview-enter' : 'theme-preview-exit') : ''}`}
               style={{
-                opacity: animatingThemes ? 0 : [0.25, 0.5, 0.8][index],
+                opacity: animatingThemes ? 0 : (showPreviews ? 1 : 0),
                 transform: `translateY(${index * -10}px)`,
                 zIndex: 10 - index,
                 height: "90px",
@@ -189,6 +190,7 @@ const ThemeSelector: React.FC = () => {
             className="w-full h-full" 
             allow="autoplay" 
             title={activeTheme.title}
+            style={{ pointerEvents: "none" }}
           ></iframe>
         </div>
       )}

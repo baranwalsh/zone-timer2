@@ -29,8 +29,8 @@ const Settings: React.FC = () => {
       toast({
         title: "Invalid divisor",
         description: "Divisor must be 1 or greater",
-        className: "popup-blur text-white border-0",
-        duration: 3000, // Auto dismiss after 3 seconds
+        className: "popup-blur text-gray-800 border-0",
+        duration: 1000, // Auto dismiss after 1 second
       });
       return;
     }
@@ -40,8 +40,8 @@ const Settings: React.FC = () => {
     toast({
       title: "Settings saved",
       description: "Your changes have been applied",
-      className: "popup-blur text-white border-0",
-      duration: 3000, // Auto dismiss after 3 seconds
+      className: "popup-blur text-gray-800 border-0",
+      duration: 1000, // Auto dismiss after 1 second
     });
     setOpen(false);
   };
@@ -121,7 +121,7 @@ const Settings: React.FC = () => {
                     min="1"
                     value={localDivisor}
                     onChange={(e) => setLocalDivisor(parseInt(e.target.value) || 1)}
-                    className="bg-white/20 border-0 text-white placeholder-white/60 focus-visible:ring-white rounded-xl"
+                    className="bg-white/20 border-0 text-white placeholder-white/60 focus-visible:ring-0 rounded-xl"
                   />
                 </div>
                 <p className="text-sm text-white/70">
@@ -139,7 +139,7 @@ const Settings: React.FC = () => {
                   placeholder="https://open.spotify.com/playlist/..."
                   value={localMusicUrl}
                   onChange={(e) => setLocalMusicUrl(e.target.value)}
-                  className="bg-white/20 border-0 text-white placeholder-white/60 focus-visible:ring-white rounded-xl"
+                  className="bg-white/20 border-0 text-white placeholder-white/60 focus-visible:ring-0 rounded-xl"
                 />
                 <p className="text-sm text-white/70">
                   Paste a Spotify or YouTube URL to play music during your sessions
@@ -148,7 +148,7 @@ const Settings: React.FC = () => {
 
               <Button 
                 onClick={handleSave} 
-                className="w-full bg-white/20 text-white border-0 rounded-xl btn-carved"
+                className="w-full bg-white/20 text-white border-0 rounded-xl hover:bg-black/3 transition-all"
               >
                 Save Changes
               </Button>

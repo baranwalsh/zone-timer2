@@ -38,8 +38,8 @@ const Timer: React.FC = () => {
       toast({
         title: "Break complete!",
         description: "Your break time is over. Ready to start working again?",
-        className: "popup-blur text-white border-0",
-        duration: 3000, // Auto dismiss after 3 seconds
+        className: "popup-blur text-gray-800 border-0",
+        duration: 1000, // Auto dismiss after 1 second
       });
     }
     
@@ -75,8 +75,8 @@ const Timer: React.FC = () => {
               toast({
                 title: "Work a bit longer",
                 description: "You should work for at least 1 minute before taking a break.",
-                className: "popup-blur text-white border-0",
-                duration: 3000,
+                className: "popup-blur text-gray-800 border-0",
+                duration: 1000,
               });
             }
           } else if (mode === 'break') {
@@ -114,23 +114,25 @@ const Timer: React.FC = () => {
       toast({
         title: "Work a bit longer",
         description: "You should work for at least 1 minute before taking a break.",
-        className: "popup-blur text-white border-0",
-        duration: 3000, // Auto dismiss after 3 seconds
+        className: "popup-blur text-gray-800 border-0",
+        duration: 1000,
       });
       return;
     }
     switchToBreak();
   };
 
-  // Render each digit with its own animation
-  const renderDigit = (current: string, index: number) => {
+  // Render each digit with fade animation
+  const renderDigit = (digit: string, index: number) => {
+    const digitClass = (prevSeconds !== seconds && index >= 3) ? "digit-fade-in" : "";
+    
     return (
       <span 
-        key={`${index}-${current}`} 
-        className="inline-block relative"
+        key={`${index}-${digit}`} 
+        className={`inline-block ${digitClass}`}
         style={{ width: index === 2 ? '0.5em' : '0.6em' }}
       >
-        {current}
+        {digit}
       </span>
     );
   };
@@ -146,12 +148,12 @@ const Timer: React.FC = () => {
               onChange={(e) => setTaskInput(e.target.value)}
               onKeyDown={handleInputKeyDown}
               placeholder="What are you focusing on?"
-              className="text-2xl md:text-3xl font-medium text-white bg-white/10 border-0 p-4 backdrop-blur-sm placeholder-white/70 rounded-2xl"
+              className="text-2xl md:text-3xl font-medium text-white bg-white/10 border-0 p-4 backdrop-blur-sm placeholder-white/70 rounded-2xl focus:outline-none focus:border-0 focus:ring-0"
               autoFocus
             />
             <Button
               onClick={handleSaveTask}
-              className="bg-white/20 hover:bg-white/23 text-white border-0 p-4 h-12 btn-carved rounded-2xl"
+              className="bg-white/20 hover:bg-black/3 text-white p-4 h-12 rounded-2xl"
             >
               Save
             </Button>
@@ -220,14 +222,14 @@ const Timer: React.FC = () => {
               {isRunning ? (
                 <Button
                   onClick={pauseTimer}
-                  className="bg-white/20 hover:bg-white/23 text-white rounded-full w-16 h-16 btn-carved"
+                  className="bg-white/20 hover:bg-black/3 text-white rounded-full w-16 h-16"
                 >
                   <PauseCircle className="w-10 h-10" />
                 </Button>
               ) : (
                 <Button
                   onClick={startTimer}
-                  className="bg-white/20 hover:bg-white/23 text-white rounded-full w-16 h-16 btn-carved"
+                  className="bg-white/20 hover:bg-black/3 text-white rounded-full w-16 h-16"
                 >
                   <PlayCircle className="w-10 h-10" />
                 </Button>
@@ -245,7 +247,7 @@ const Timer: React.FC = () => {
               <TooltipTrigger asChild>
                 <Button
                   onClick={handleSwitchToBreak}
-                  className="bg-white/20 hover:bg-white/23 text-white rounded-full w-16 h-16 btn-carved"
+                  className="bg-white/20 hover:bg-black/3 text-white rounded-full w-16 h-16"
                 >
                   <SkipForward className="w-8 h-8" />
                 </Button>
@@ -262,7 +264,7 @@ const Timer: React.FC = () => {
             <TooltipTrigger asChild>
               <Button
                 onClick={resetTimer}
-                className="bg-white/20 hover:bg-white/23 text-white rounded-full w-16 h-16 btn-carved"
+                className="bg-white/20 hover:bg-black/3 text-white rounded-full w-16 h-16"
               >
                 <RefreshCw className="w-8 h-8" />
               </Button>

@@ -11,12 +11,27 @@ import FullscreenButton from "@/components/FullscreenButton";
 import ThemeSelector from "@/components/ThemeSelector";
 import BreakProgressBar from "@/components/BreakProgressBar";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Zone logo component
 const Logo: React.FC = () => (
-  <div className="text-white text-4xl font-bold tracking-tight">
-    <img src="/lovable-uploads/1e67c2cf-62b8-4e21-a652-aaec2976cbaf.png" alt="Zone" className="h-12" />
-  </div>
+  <TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <a 
+          href="https://zone-flow.vercel.app" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="cursor-pointer transition-opacity hover:opacity-80 flex"
+        >
+          <img src="/lovable-uploads/1e67c2cf-62b8-4e21-a652-aaec2976cbaf.png" alt="Zone" className="h-12" />
+        </a>
+      </TooltipTrigger>
+      <TooltipContent className="custom-tooltip">
+        <p className="text-sm">Need kanban within kanbans?</p>
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
 );
 
 // Inner content that uses the timer context
@@ -50,7 +65,21 @@ const TimerApp: React.FC = () => {
             'https://i.ibb.co/5yh9rYG/image-2025-03-29-144539849.png',
             'https://i.ibb.co/27B4zDkW/image.png'
           ];
-          await Promise.all(urls.map(url => cache.add(new Request(url))));
+          
+          // Preload images
+          const preloadImages = urls
+            .filter(url => url.includes('.png') || url.includes('.jpg'))
+            .map(url => {
+              return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = url;
+                img.onload = resolve;
+                img.onerror = reject;
+              });
+            });
+            
+          await Promise.all([...preloadImages, ...urls.map(url => cache.add(new Request(url)))]);
+          console.log('Media cached and preloaded successfully');
         }
       } catch (error) {
         console.error('Failed to cache media:', error);
