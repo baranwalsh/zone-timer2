@@ -1,7 +1,7 @@
 
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Diamond, X, ChevronUp, ChevronDown } from "lucide-react";
+import { Diamond, X, ChevronUp, ChevronDown, ArrowRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTimer } from "@/contexts/TimerContext";
 import {
@@ -61,8 +61,11 @@ const themes: Theme[] = [
 const ThemeSelector: React.FC = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [activeTheme, setActiveTheme] = useState<Theme | null>(null);
+  const [hoverTheme, setHoverTheme] = useState<number | null>(null);
   const { playSound } = useTimer();
   const isDragging = useRef(false);
+  const touchStartY = useRef(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const handleThemeToggle = () => {
     setShowPicker(prev => !prev);
@@ -84,8 +87,12 @@ const ThemeSelector: React.FC = () => {
     playSound("refresh");
   };
 
-  const handleDragStart = () => {
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
     isDragging.current = true;
+    if (e.type === 'touchstart') {
+      const touchEvent = e as React.TouchEvent;
+      touchStartY.current = touchEvent.touches[0].clientY;
+    }
   };
 
   const handleDragEnd = () => {
@@ -93,6 +100,34 @@ const ThemeSelector: React.FC = () => {
     setTimeout(() => {
       isDragging.current = false;
     }, 100);
+  };
+
+  const handleMouseEnter = (id: number) => {
+    setHoverTheme(id);
+  };
+
+  const handleMouseLeave = () => {
+    setHoverTheme(null);
+  };
+
+  // Handle wheel events for scrolling
+  const handleWheel = (e: React.WheelEvent) => {
+    if (!carouselRef.current) return;
+    
+    e.preventDefault();
+    const scrollAmount = e.deltaY * 0.5;
+    carouselRef.current.scrollTop += scrollAmount;
+  };
+
+  // Handle touch move for mobile scrolling
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!carouselRef.current) return;
+    
+    const currentY = e.touches[0].clientY;
+    const diff = touchStartY.current - currentY;
+    touchStartY.current = currentY;
+    
+    carouselRef.current.scrollTop += diff;
   };
 
   return (
@@ -156,59 +191,80 @@ const ThemeSelector: React.FC = () => {
               </Button>
             </div>
             
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-                dragFree: true,
-              }}
-              orientation="vertical"
-              className="h-80"
+            <div 
+              ref={carouselRef}
+              className="h-80 overflow-y-auto"
+              onWheel={handleWheel}
+              onTouchStart={handleDragStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleDragEnd}
             >
-              <CarouselContent className="-mt-1 h-full">
+              <div className="space-y-3 pr-2">
                 {themes.map((theme) => (
-                  <CarouselItem key={theme.id} className="pt-1 basis-1/3 md:basis-1/3">
-                    <div
-                      className="aspect-video relative overflow-hidden rounded-md cursor-pointer hover:ring-2 hover:ring-white/50 transition-all duration-200 h-full"
-                      onClick={() => handleThemeSelect(theme)}
-                      onMouseDown={handleDragStart}
-                      onMouseUp={handleDragEnd}
-                      onTouchStart={handleDragStart}
-                      onTouchEnd={handleDragEnd}
-                    >
-                      <img 
-                        src={theme.url} 
-                        alt={theme.title} 
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-2">
-                        <span className="text-white text-xs font-medium">{theme.title}</span>
-                      </div>
-                    </div>
-                  </CarouselItem>
+                  <div
+                    key={theme.id}
+                    className={cn(
+                      "relative rounded-md overflow-hidden transition-all duration-200",
+                      hoverTheme === theme.id ? "opacity-97" : "opacity-100"
+                    )}
+                    onMouseEnter={() => handleMouseEnter(theme.id)}
+                    onMouseLeave={handleMouseLeave}
+                    onMouseDown={handleDragStart}
+                    onMouseUp={handleDragEnd}
+                  >
+                    <img 
+                      src={theme.url} 
+                      alt=""
+                      className="w-full h-32 object-cover"
+                    />
+                    
+                    {hoverTheme === theme.id && (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-black/50 flex items-center justify-center"
+                      >
+                        <Button
+                          variant="ghost"
+                          onClick={() => handleThemeSelect(theme)}
+                          className="bg-white/10 hover:bg-white/20 text-white gap-2 rounded-full"
+                        >
+                          Apply <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </motion.div>
+                    )}
+                  </div>
                 ))}
-              </CarouselContent>
-              <div className="flex justify-center mt-2 space-x-1">
-                <Button 
-                  size="icon"
-                  variant="outline"
-                  className="h-8 w-8 rounded-full bg-white/10 border-white/20 text-white hover:bg-white/20"
-                  onClick={() => document.querySelector<HTMLButtonElement>('[data-carousel-button="prev"]')?.click()}
-                >
-                  <ChevronUp className="h-4 w-4" />
-                </Button>
-                <Button 
-                  size="icon"
-                  variant="outline"
-                  className="h-8 w-8 rounded-full bg-white/10 border-white/20 text-white hover:bg-white/20"
-                  onClick={() => document.querySelector<HTMLButtonElement>('[data-carousel-button="next"]')?.click()}
-                >
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
               </div>
-              <CarouselPrevious className="left-1/2 -translate-x-[calc(50%+16px)] -top-1 bg-white/10 text-white hover:bg-white/20 border-white/20" data-carousel-button="prev" />
-              <CarouselNext className="left-1/2 -translate-x-[calc(50%-16px)] -bottom-1 bg-white/10 text-white hover:bg-white/20 border-white/20" data-carousel-button="next" />
-            </Carousel>
+            </div>
+            
+            <div className="flex justify-center mt-2 space-x-1">
+              <Button 
+                size="icon"
+                variant="outline"
+                className="h-8 w-8 rounded-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                onClick={() => {
+                  if (carouselRef.current) {
+                    carouselRef.current.scrollTop -= 100;
+                  }
+                }}
+              >
+                <ChevronUp className="h-4 w-4" />
+              </Button>
+              <Button 
+                size="icon"
+                variant="outline"
+                className="h-8 w-8 rounded-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                onClick={() => {
+                  if (carouselRef.current) {
+                    carouselRef.current.scrollTop += 100;
+                  }
+                }}
+              >
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -217,8 +273,8 @@ const ThemeSelector: React.FC = () => {
         <div className="fixed inset-0 pointer-events-none z-0 bg-theme-fade transition-opacity duration-1000">
           <img 
             src={activeTheme.url} 
-            alt={activeTheme.title}
-            className="w-full h-full object-cover" 
+            alt=""
+            className="w-full h-full object-cover transition-opacity duration-500" 
           />
           <div className="absolute inset-0 bg-black/10 pointer-events-none"></div>
         </div>

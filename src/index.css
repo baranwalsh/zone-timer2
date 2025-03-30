@@ -214,6 +214,14 @@
   .bg-theme-fade {
     transition: opacity 1s ease-in-out, background-image 1s ease-in-out;
   }
+
+  .theme-fade-in {
+    animation: theme-fade-in 0.3s ease-out forwards;
+  }
+  
+  .theme-fade-out {
+    animation: theme-fade-out 0.3s ease-out forwards;
+  }
 }
 
 /* Make input placeholder text white */
@@ -244,14 +252,6 @@
 }
 
 /* Theme selector animations */
-.theme-preview-enter {
-  animation: theme-fade-in 0.3s ease-out forwards;
-}
-
-.theme-preview-exit {
-  animation: theme-fade-out 0.3s ease-out forwards;
-}
-
 @keyframes theme-fade-in {
   0% {
     opacity: 0;
@@ -276,7 +276,7 @@
 
 /* Add fade transition for themes */
 .theme-transition {
-  transition: opacity 0.5s ease-in-out;
+  transition: opacity 0.5s ease-in-out, background-image 0.5s ease-in-out;
   z-index: -1;
 }
 

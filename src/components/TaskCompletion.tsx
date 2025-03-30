@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from "react";
-import { Check, MoreHorizontal, History } from "lucide-react";
+import { Check, MoreHorizontal, History, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTimer } from "@/contexts/TimerContext";
 import { toast } from "@/components/ui/use-toast";
@@ -117,10 +117,10 @@ const TaskCompletion: React.FC = () => {
                   variant="ghost"
                   className="bg-white/20 hover:bg-white/10 hover:border hover:border-white/50 text-white timer-btn-hover rounded-full w-12 h-12"
                 >
-                  <History className="w-5 h-5" />
+                  <History className="w-5 h-5 text-white" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md bg-black/70 backdrop-blur-lg border-white/20 text-white">
+              <DialogContent className="sm:max-w-md work-gradient border-white/20 text-white">
                 <DialogHeader>
                   <DialogTitle className="text-white">Task History</DialogTitle>
                 </DialogHeader>

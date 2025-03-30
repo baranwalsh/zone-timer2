@@ -63,7 +63,7 @@ const Logo: React.FC = () => {
           className="hover:bg-white/20 cursor-pointer"
           onClick={() => window.open("https://zone-flow.vercel.app", "_blank")}
         >
-          Work Timer
+          Flow Kanban
         </DropdownMenuItem>
         <DropdownMenuItem 
           className="hover:bg-white/20 cursor-pointer"
