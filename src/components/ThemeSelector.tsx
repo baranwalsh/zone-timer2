@@ -1,107 +1,98 @@
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Diamond, X, ArrowRight } from "lucide-react";
+import { Diamond, X, ChevronUp, ChevronDown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTimer } from "@/contexts/TimerContext";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 type Theme = {
   id: number;
   url: string;
   title: string;
-  previewImg: string;
 };
 
 const themes: Theme[] = [
   {
     id: 1,
-    url: "https://drive.google.com/file/d/1ASBFSvPnvcFwbxPwdjyYoNqeRHVXFtk_/preview",
-    title: "Ocean Waves",
-    previewImg: "https://i.ibb.co/TM70RnnZ/image.png"
+    url: "https://wallpaperaccess.com/full/345256.jpg",
+    title: "Mountain Sunset"
   },
   {
     id: 2,
-    url: "https://drive.google.com/file/d/1e2zAwdj6mg24GIoAcW_4ibF_cxp7s2nr/preview",
-    title: "Northern Lights",
-    previewImg: "https://i.ibb.co/5yh9rYG/image-2025-03-29-144539849.png"
+    url: "https://wallpaperaccess.com/full/345168.jpg",
+    title: "Aurora Borealis"
   },
   {
     id: 3,
-    url: "https://drive.google.com/file/d/1NPpUb5_2D4P6SDjkN5EgNkWS1Pb8pnrz/preview",
-    title: "Forest Stream",
-    previewImg: "https://i.ibb.co/27B4zDkW/image.png"
+    url: "https://wallpaperaccess.com/full/30119.png",
+    title: "Purple Fantasy"
   },
+  {
+    id: 4,
+    url: "https://wallpaperaccess.com/full/345367.jpg",
+    title: "Snow Mountain"
+  },
+  {
+    id: 5,
+    url: "https://img.freepik.com/free-photo/japan-background-digital-art_23-2151546139.jpg",
+    title: "Digital Japan"
+  },
+  {
+    id: 6,
+    url: "https://img.freepik.com/free-photo/cityscape-anime-inspired-urban-area_23-2151028678.jpg",
+    title: "Anime Cityscape"
+  },
+  {
+    id: 7,
+    url: "https://wallpaperaccess.com/full/345388.jpg",
+    title: "Nature Forest"
+  }
 ];
 
 const ThemeSelector: React.FC = () => {
-  const [showPreviews, setShowPreviews] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
   const [activeTheme, setActiveTheme] = useState<Theme | null>(null);
   const { playSound } = useTimer();
-  const previewsRef = useRef<HTMLDivElement | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [animatingThemes, setAnimatingThemes] = useState<boolean>(false);
-
-  useEffect(() => {
-    // Auto hide previews when mouse leaves area
-    const handleMouseMovement = (e: MouseEvent) => {
-      if (!showPreviews || activeTheme) return;
-      
-      const isOverButton = (e.target as HTMLElement)?.closest('.theme-button');
-      const isOverPreview = (e.target as HTMLElement)?.closest('.theme-previews');
-      
-      if (!isOverButton && !isOverPreview) {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        timeoutRef.current = setTimeout(() => {
-          setShowPreviews(false);
-        }, 1000);
-      } else {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      }
-    };
-    
-    document.addEventListener('mousemove', handleMouseMovement);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMovement);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [showPreviews, activeTheme]);
+  const isDragging = useRef(false);
 
   const handleThemeToggle = () => {
-    if (showPreviews) {
-      // Start exit animation
-      setAnimatingThemes(true);
-      setTimeout(() => {
-        setShowPreviews(false);
-        setAnimatingThemes(false);
-      }, 300 * themes.length); // Give time for cascading animation
-    } else {
-      setShowPreviews(true);
-      setAnimatingThemes(true);
-      setTimeout(() => {
-        setAnimatingThemes(false);
-      }, 300 * themes.length); // Give time for cascading animation
-    }
+    setShowPicker(prev => !prev);
     playSound("refresh");
   };
 
   const handleThemeSelect = (theme: Theme) => {
+    if (isDragging.current) {
+      isDragging.current = false;
+      return;
+    }
     setActiveTheme(theme);
-    setShowPreviews(false);
+    setShowPicker(false);
     playSound("refresh");
   };
 
   const handleThemeClose = () => {
-    // Fade out the active theme
-    const themeEl = document.querySelector('.theme-iframe-container') as HTMLElement;
-    if (themeEl) {
-      themeEl.style.opacity = '0';
-      setTimeout(() => {
-        setActiveTheme(null);
-      }, 500);
-    } else {
-      setActiveTheme(null);
-    }
+    setActiveTheme(null);
     playSound("refresh");
+  };
+
+  const handleDragStart = () => {
+    isDragging.current = true;
+  };
+
+  const handleDragEnd = () => {
+    // Reset after a short delay to allow click events to work
+    setTimeout(() => {
+      isDragging.current = false;
+    }, 100);
   };
 
   return (
@@ -113,7 +104,7 @@ const ThemeSelector: React.FC = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full p-2 btn-hover bg-white/10 backdrop-blur-sm text-white z-20 relative theme-button"
+                className="rounded-full p-2 btn-hover bg-white/10 backdrop-blur-sm text-white z-20 relative"
                 onClick={handleThemeClose}
               >
                 <X className="w-5 h-5" />
@@ -131,7 +122,7 @@ const ThemeSelector: React.FC = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full p-2 btn-hover bg-white/10 backdrop-blur-sm text-white theme-button"
+                className="rounded-full p-2 btn-hover bg-white/10 backdrop-blur-sm text-white relative z-30"
                 onClick={handleThemeToggle}
               >
                 <Diamond className="w-5 h-5" />
@@ -144,65 +135,92 @@ const ThemeSelector: React.FC = () => {
         </TooltipProvider>
       )}
 
-      {showPreviews && !activeTheme && (
-        <div 
-          ref={previewsRef}
-          className="theme-previews absolute right-0 bottom-12 flex flex-col-reverse gap-2"
-          style={{ right: '-5px' }}  // Move themes more to the right
-        >
-          {themes.map((theme, index) => (
-            <div 
-              key={theme.id}
-              className={`theme-preview cursor-pointer relative group ${animatingThemes ? (showPreviews ? 'theme-preview-enter' : 'theme-preview-exit') : ''}`}
-              style={{
-                opacity: animatingThemes ? 0 : (showPreviews ? 1 : 0),
-                transform: `translateY(${index * -10}px)`,
-                zIndex: 10 - index,
-                height: "90px",
-                width: "160px",
-                transition: "opacity 0.3s ease-in-out",
-                animationDelay: `${index * 0.1}s`
+      <AnimatePresence>
+        {showPicker && !activeTheme && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute bottom-12 right-0 z-20 w-64 rounded-xl overflow-hidden backdrop-blur-md bg-black/30 border border-white/20 p-3"
+          >
+            <div className="text-white text-sm font-medium mb-2 flex justify-between items-center">
+              <span>Select Theme</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-6 h-6 p-0 hover:bg-white/10 text-white"
+                onClick={() => setShowPicker(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+                dragFree: true,
               }}
+              orientation="vertical"
+              className="h-80"
             >
-              <img 
-                src={theme.previewImg} 
-                alt={theme.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
-                <Button
-                  className="bg-white/30 hover:bg-white/50 text-white rounded-full p-2 flex items-center space-x-1"
-                  onClick={() => handleThemeSelect(theme)}
+              <CarouselContent className="-mt-1 h-full">
+                {themes.map((theme) => (
+                  <CarouselItem key={theme.id} className="pt-1 basis-1/3 md:basis-1/3">
+                    <div
+                      className="aspect-video relative overflow-hidden rounded-md cursor-pointer hover:ring-2 hover:ring-white/50 transition-all duration-200 h-full"
+                      onClick={() => handleThemeSelect(theme)}
+                      onMouseDown={handleDragStart}
+                      onMouseUp={handleDragEnd}
+                      onTouchStart={handleDragStart}
+                      onTouchEnd={handleDragEnd}
+                    >
+                      <img 
+                        src={theme.url} 
+                        alt={theme.title} 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-2">
+                        <span className="text-white text-xs font-medium">{theme.title}</span>
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="flex justify-center mt-2 space-x-1">
+                <Button 
+                  size="icon"
+                  variant="outline"
+                  className="h-8 w-8 rounded-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  onClick={() => document.querySelector<HTMLButtonElement>('[data-carousel-button="prev"]')?.click()}
                 >
-                  <span>Apply</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+                <Button 
+                  size="icon"
+                  variant="outline"
+                  className="h-8 w-8 rounded-full bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  onClick={() => document.querySelector<HTMLButtonElement>('[data-carousel-button="next"]')?.click()}
+                >
+                  <ChevronDown className="h-4 w-4" />
                 </Button>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+              <CarouselPrevious className="left-1/2 -translate-x-[calc(50%+16px)] -top-1 bg-white/10 text-white hover:bg-white/20 border-white/20" data-carousel-button="prev" />
+              <CarouselNext className="left-1/2 -translate-x-[calc(50%-16px)] -bottom-1 bg-white/10 text-white hover:bg-white/20 border-white/20" data-carousel-button="next" />
+            </Carousel>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {activeTheme && (
-        <div className="fixed inset-0 pointer-events-none z-0 theme-iframe-container theme-transition">
-          <iframe 
+        <div className="fixed inset-0 pointer-events-none z-0 bg-theme-fade transition-opacity duration-1000">
+          <img 
             src={activeTheme.url} 
-            className="w-full h-full" 
-            allow="autoplay" 
-            title={activeTheme.title}
-            style={{ 
-              pointerEvents: "none",
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%"
-            }}
-            frameBorder="0"
-            allowFullScreen
-          ></iframe>
-          {/* Additional black overlay to make the content more visible if needed */}
-          <div className="absolute inset-0 bg-black/5 pointer-events-none"></div>
+            alt={activeTheme.title}
+            className="w-full h-full object-cover" 
+          />
+          <div className="absolute inset-0 bg-black/10 pointer-events-none"></div>
         </div>
       )}
     </div>

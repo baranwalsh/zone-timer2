@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTimer } from "@/contexts/TimerContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,14 +15,21 @@ import { Label } from "@/components/ui/label";
 import { Settings as SettingsIcon } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Slider } from "@/components/ui/slider";
 import MoodistEmbed from "./MoodistEmbed";
 
 const Settings: React.FC = () => {
-  const { divisor, setDivisor, musicUrl, setMusicUrl, playSound } = useTimer();
+  const { divisor, setDivisor, musicUrl, setMusicUrl, playSound, backgroundDarkness, setBackgroundDarkness } = useTimer();
   const [localDivisor, setLocalDivisor] = useState<number>(divisor);
   const [localMusicUrl, setLocalMusicUrl] = useState<string>(musicUrl);
+  const [localBackgroundDarkness, setLocalBackgroundDarkness] = useState<number>(backgroundDarkness);
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"settings" | "moodist">("settings");
+
+  useEffect(() => {
+    // Apply background darkness to CSS variable
+    document.documentElement.style.setProperty('--background-darkness', `${localBackgroundDarkness}`);
+  }, [localBackgroundDarkness]);
 
   const handleSave = () => {
     if (localDivisor < 1) {
@@ -30,18 +37,20 @@ const Settings: React.FC = () => {
         title: "Invalid divisor",
         description: "Divisor must be 1 or greater",
         className: "popup-blur text-gray-800 border-0",
-        duration: 1000, // Auto dismiss after 1 second
+        duration: 3000, // Auto dismiss after 3 seconds
       });
       return;
     }
 
     setDivisor(localDivisor);
     setMusicUrl(localMusicUrl);
+    setBackgroundDarkness(localBackgroundDarkness);
+    
     toast({
       title: "Settings saved",
       description: "Your changes have been applied",
       className: "popup-blur text-gray-800 border-0",
-      duration: 1000, // Auto dismiss after 1 second
+      duration: 3000, // Auto dismiss after 3 seconds
     });
     setOpen(false);
   };
@@ -130,6 +139,24 @@ const Settings: React.FC = () => {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="background-darkness" className="text-white text-sm font-medium">
+                  Background Darkness: {localBackgroundDarkness}%
+                </Label>
+                <Slider
+                  id="background-darkness"
+                  value={[localBackgroundDarkness]}
+                  min={0}
+                  max={50}
+                  step={1}
+                  onValueChange={(value) => setLocalBackgroundDarkness(value[0])}
+                  className="bg-white/20 rounded-full"
+                />
+                <p className="text-sm text-white/70">
+                  Adjust how dark the background appears
+                </p>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="music" className="text-white text-sm font-medium">
                   Music URL (YouTube or Spotify)
                 </Label>
@@ -148,7 +175,7 @@ const Settings: React.FC = () => {
 
               <Button 
                 onClick={handleSave} 
-                className="w-full bg-white/20 text-white border-0 rounded-xl hover:bg-black/3 transition-all"
+                className="w-full bg-white/20 text-white border-0 rounded-xl hover:bg-white/30 transition-all"
               >
                 Save Changes
               </Button>

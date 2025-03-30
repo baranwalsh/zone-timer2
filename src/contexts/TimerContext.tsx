@@ -1,200 +1,129 @@
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react";
 
-import React, { createContext, useContext, useState, useEffect, useRef } from "react";
-import { toast } from "@/components/ui/use-toast";
-
-type TimerMode = "work" | "break" | "idle";
-type SoundType = "work" | "break" | "refresh";
-
-interface TimerContextType {
-  seconds: number;
+type TimerContextType = {
+  time: number;
+  mode: "work" | "break" | "idle";
   isRunning: boolean;
-  mode: TimerMode;
   divisor: number;
-  currentTask: string;
-  totalWorkTime: number;
-  breakTime: number;
   musicUrl: string;
-  setMusicUrl: (url: string) => void;
-  setDivisor: (divisor: number) => void;
-  setCurrentTask: (task: string) => void;
+  backgroundDarkness: number;
+  setBackgroundDarkness: React.Dispatch<React.SetStateAction<number>>;
   startTimer: () => void;
   pauseTimer: () => void;
   resetTimer: () => void;
-  switchToBreak: () => void;
-  switchToWork: () => void;
-  playSound: (type: SoundType) => void;
-}
+  setTime: React.Dispatch<React.SetStateAction<number>>;
+  setMode: React.Dispatch<React.SetStateAction<"work" | "break" | "idle">>;
+  setDivisor: React.Dispatch<React.SetStateAction<number>>;
+  setMusicUrl: React.Dispatch<React.SetStateAction<string>>;
+  playSound: (sound: "work" | "break" | "refresh") => void;
+  taskName: string;
+  setTaskName: React.Dispatch<React.SetStateAction<string>>;
+  taskHistory: string[];
+  addTaskToHistory: (task: string) => void;
+};
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
 export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [seconds, setSeconds] = useState<number>(0);
+  const [time, setTime] = useState<number>(25 * 60);
+  const [mode, setMode] = useState<"work" | "break" | "idle">("idle");
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [mode, setMode] = useState<TimerMode>("idle");
   const [divisor, setDivisor] = useState<number>(5);
-  const [currentTask, setCurrentTask] = useState<string>("");
-  const [totalWorkTime, setTotalWorkTime] = useState<number>(0);
-  const [breakTime, setBreakTime] = useState<number>(0);
   const [musicUrl, setMusicUrl] = useState<string>("");
-
-  const workSoundRef = useRef<HTMLAudioElement | null>(null);
-  const breakSoundRef = useRef<HTMLAudioElement | null>(null);
-  const refreshSoundRef = useRef<HTMLAudioElement | null>(null);
+  const [backgroundDarkness, setBackgroundDarkness] = useState<number>(10);
+  const [taskName, setTaskName] = useState<string>("");
+  const [taskHistory, setTaskHistory] = useState<string[]>([]);
 
   useEffect(() => {
-    workSoundRef.current = new Audio("https://whyp.it/tracks/269053/work");
-    breakSoundRef.current = new Audio("https://whyp.it/tracks/269054/break");
-    refreshSoundRef.current = new Audio("https://whyp.it/tracks/269055/refresh");
-    
-    return () => {
-      workSoundRef.current = null;
-      breakSoundRef.current = null;
-      refreshSoundRef.current = null;
-    };
+    let intervalId: NodeJS.Timeout;
+
+    if (isRunning && mode !== "idle") {
+      intervalId = setInterval(() => {
+        setTime((prevTime) => {
+          if (prevTime <= 0) {
+            clearInterval(intervalId);
+            if (mode === "work") {
+              setMode("break");
+              setTime(25 * 60 / divisor);
+              playSound("break");
+            } else if (mode === "break") {
+              setMode("work");
+              setTime(25 * 60);
+              playSound("work");
+            }
+            setIsRunning(false);
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(intervalId);
+  }, [isRunning, mode, divisor, playSound]);
+
+  // Apply background darkness on initial load and when it changes
+  useEffect(() => {
+    document.documentElement.style.setProperty('--background-darkness', `${backgroundDarkness}`);
+  }, [backgroundDarkness]);
+
+  const playSound = useCallback((sound: "work" | "break" | "refresh") => {
+    const audio = new Audio(`https://whyp.it/tracks/26905${sound === 'work' ? 3 : sound === 'break' ? 4 : 5}/${sound}`);
+    audio.play().catch(error => console.error("Playback failed:", error));
   }, []);
 
-  const playSound = (type: SoundType) => {
-    try {
-      if (type === "work" && workSoundRef.current) {
-        workSoundRef.current.currentTime = 0;
-        workSoundRef.current.play();
-      } else if (type === "break" && breakSoundRef.current) {
-        breakSoundRef.current.currentTime = 0;
-        breakSoundRef.current.play();
-      } else if (type === "refresh" && refreshSoundRef.current) {
-        refreshSoundRef.current.currentTime = 0;
-        refreshSoundRef.current.play();
-      }
-    } catch (error) {
-      console.error("Error playing sound:", error);
+  const addTaskToHistory = (task: string) => {
+    if (task.trim() !== "") {
+      setTaskHistory(prev => [task, ...prev]);
+      setTaskName("");
     }
-  };
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-
-    if (isRunning) {
-      interval = setInterval(() => {
-        setSeconds((prevSeconds) => prevSeconds + 1);
-        
-        if (mode === "work") {
-          setTotalWorkTime((prevTotal) => prevTotal + 1);
-        }
-      }, 1000);
-    } else if (interval) {
-      clearInterval(interval);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isRunning, mode]);
-
-  // Custom toast function with auto-dismiss
-  const showToast = (title: string, description: string) => {
-    toast({
-      title,
-      description,
-      className: "popup-blur text-gray-800 border-0 cursor-pointer",
-      duration: 3000, // Auto dismiss after 3 seconds
-    });
   };
 
   const startTimer = () => {
-    if (currentTask.trim() === "" && mode === "idle") {
-      showToast(
-        "Please enter a task",
-        "Enter what you're focusing on before starting the timer."
-      );
-      return;
-    }
-    
     setIsRunning(true);
     if (mode === "idle") {
       setMode("work");
-      playSound("work");
-    } else if (mode === "break") {
-      playSound("break");
     }
   };
 
   const pauseTimer = () => {
     setIsRunning(false);
-    if (mode === "break") {
-      playSound("break");
-    }
   };
 
   const resetTimer = () => {
     setIsRunning(false);
-    setSeconds(0);
     setMode("idle");
-    setBreakTime(0);
-    playSound("refresh");
-  };
-
-  const switchToBreak = () => {
-    if (currentTask.trim() === "") {
-      showToast(
-        "Please enter a task",
-        "Enter what you're focusing on before starting a break."
-      );
-      return;
-    }
-    
-    const calculatedBreakTime = Math.floor(totalWorkTime / divisor);
-    setBreakTime(calculatedBreakTime);
-    setSeconds(0);
-    setMode("break");
-    playSound("break");
-    
-    showToast(
-      "Break Time!",
-      `Take a ${Math.floor(calculatedBreakTime / 60)} minute break.`
-    );
-  };
-
-  const switchToWork = () => {
-    if (currentTask.trim() === "") {
-      showToast(
-        "Please enter a task",
-        "Enter what you're focusing on before starting work."
-      );
-      return;
-    }
-    
-    setSeconds(0);
-    setMode("work");
-    setTotalWorkTime(0);
-    setBreakTime(0);
-    playSound("work");
-
-    showToast(
-      "Back to Work!",
-      "Work session started. Focus on your task."
-    );
+    setTime(25 * 60);
   };
 
   return (
-    <TimerContext.Provider
-      value={{
-        seconds,
-        isRunning,
-        mode,
-        divisor,
-        currentTask,
-        totalWorkTime,
-        breakTime,
+    <TimerContext.Provider 
+      value={{ 
+        time, 
+        mode, 
+        isRunning, 
+        divisor, 
         musicUrl,
+        backgroundDarkness,
+        setBackgroundDarkness,
+        startTimer, 
+        pauseTimer, 
+        resetTimer, 
+        setTime, 
+        setMode, 
+        setDivisor, 
         setMusicUrl,
-        setDivisor,
-        setCurrentTask,
-        startTimer,
-        pauseTimer,
-        resetTimer,
-        switchToBreak,
-        switchToWork,
         playSound,
+        taskName,
+        setTaskName,
+        taskHistory,
+        addTaskToHistory
       }}
     >
       {children}
@@ -204,7 +133,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 export const useTimer = () => {
   const context = useContext(TimerContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useTimer must be used within a TimerProvider");
   }
   return context;
