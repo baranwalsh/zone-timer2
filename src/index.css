@@ -186,9 +186,79 @@
   }
   
   .btn-carved:hover {
-    @apply bg-black/3;
+    @apply bg-black bg-opacity-3;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
   }
+}
+
+/* Make input placeholder text white */
+::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+::-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Custom tooltip positioning */
+.custom-tooltip {
+  transform: translateX(-50%) !important;
+  left: 50% !important;
+  bottom: calc(100% + 10px) !important;
+  margin-bottom: 0 !important;
+}
+
+.btn-carved:hover {
+  @apply bg-black/3;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+/* Theme selector animations */
+.theme-preview-enter {
+  animation: theme-fade-in 0.3s ease-out forwards;
+}
+
+.theme-preview-exit {
+  animation: theme-fade-out 0.3s ease-out forwards;
+}
+
+@keyframes theme-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes theme-fade-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* Add fade transition for themes */
+.theme-transition {
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* Remove all borders from input fields when focused */
+input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 @keyframes gradient-animation {
@@ -317,74 +387,4 @@
   100% {
     opacity: 0;
   }
-}
-
-/* Make input placeholder text white */
-::placeholder {
-  color: rgba(255, 255, 255, 0.7) !important;
-  opacity: 1;
-}
-
-:-ms-input-placeholder {
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-::-ms-input-placeholder {
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-/* Custom tooltip positioning */
-.custom-tooltip {
-  transform: translateX(-50%) !important;
-  left: 50% !important;
-  bottom: calc(100% + 10px) !important;
-  margin-bottom: 0 !important;
-}
-
-.btn-carved:hover {
-  @apply bg-black/3;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
-}
-
-/* Theme selector animations */
-.theme-preview-enter {
-  animation: theme-fade-in 0.3s ease-out forwards;
-}
-
-.theme-preview-exit {
-  animation: theme-fade-out 0.3s ease-out forwards;
-}
-
-@keyframes theme-fade-in {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes theme-fade-out {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-}
-
-/* Add fade transition for themes */
-.theme-transition {
-  transition: opacity 0.5s ease-in-out;
-}
-
-/* Remove all borders from input fields when focused */
-input:focus {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
 }
