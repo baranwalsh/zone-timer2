@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Check, MoreHorizontal, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTimer } from "@/contexts/TimerContext";
@@ -24,6 +24,16 @@ const TaskCompletion: React.FC = () => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleComplete = () => {
     if (!currentTask.trim()) {
@@ -54,6 +64,22 @@ const TaskCompletion: React.FC = () => {
     setCurrentTask("");
   };
 
+  const handleMouseEnter = () => {
+    // Clear any existing timeout to hide the menu
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+    setIsMenuVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    // Set a timeout to hide the menu after 1 second
+    hideTimeoutRef.current = setTimeout(() => {
+      setIsMenuVisible(false);
+    }, 1000);
+  };
+
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
@@ -64,12 +90,14 @@ const TaskCompletion: React.FC = () => {
   };
 
   return (
-    <div className="relative flex items-center space-x-2">
+    <div 
+      className="relative flex items-center space-x-2"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <Button
         onClick={handleComplete}
-        className="bg-white/20 hover:bg-white/10 text-white timer-btn-hover rounded-full w-12 h-12"
-        onMouseEnter={() => setIsMenuVisible(true)}
-        onMouseLeave={() => setIsMenuVisible(false)}
+        className="bg-white/20 hover:bg-white/10 hover:border hover:border-white/50 text-white timer-btn-hover rounded-full w-12 h-12"
       >
         <Check className="w-6 h-6" />
       </Button>
@@ -81,12 +109,13 @@ const TaskCompletion: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -10 }}
             transition={{ duration: 0.2 }}
+            className="absolute left-16"
           >
             <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
               <DialogTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="bg-white/20 hover:bg-white/10 text-white timer-btn-hover rounded-full w-12 h-12"
+                  className="bg-white/20 hover:bg-white/10 hover:border hover:border-white/50 text-white timer-btn-hover rounded-full w-12 h-12"
                 >
                   <History className="w-5 h-5" />
                 </Button>

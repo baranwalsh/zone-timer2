@@ -116,7 +116,7 @@
     background-image: linear-gradient(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.12)), url('https://i.ibb.co/zTvYrVtc/01-colorful-smooth-gradient.jpg');
     background-size: cover;
     background-position: center;
-    filter: saturate(1.05);
+    filter: saturate(1.3) brightness(0.92);
   }
   
   .navbar-shadow {
@@ -131,7 +131,7 @@
   }
   
   .timer-btn-hover {
-    @apply transition-all duration-300 hover:bg-opacity-6 hover:border border-white/50;
+    @apply transition-all duration-300 hover:bg-opacity-3 hover:border hover:border-white/50;
   }
   
   .btn-hover {
@@ -265,6 +265,26 @@
 /* Add fade transition for themes */
 .theme-transition {
   transition: opacity 0.5s ease-in-out;
+  z-index: -1;
+}
+
+/* Ensure the video stays in the background */
+.theme-iframe-container {
+  z-index: -1;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.theme-iframe-container iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* Remove all borders from input fields when focused */

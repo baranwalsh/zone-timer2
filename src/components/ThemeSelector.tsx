@@ -148,7 +148,7 @@ const ThemeSelector: React.FC = () => {
         <div 
           ref={previewsRef}
           className="theme-previews absolute right-0 bottom-12 flex flex-col-reverse gap-2"
-          style={{ right: '-30px' }}  // Move themes more to the right
+          style={{ right: '-5px' }}  // Move themes more to the right
         >
           {themes.map((theme, index) => (
             <div 
@@ -190,8 +190,19 @@ const ThemeSelector: React.FC = () => {
             className="w-full h-full" 
             allow="autoplay" 
             title={activeTheme.title}
-            style={{ pointerEvents: "none" }}
+            style={{ 
+              pointerEvents: "none",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%"
+            }}
+            frameBorder="0"
+            allowFullScreen
           ></iframe>
+          {/* Additional black overlay to make the content more visible if needed */}
+          <div className="absolute inset-0 bg-black/5 pointer-events-none"></div>
         </div>
       )}
     </div>
