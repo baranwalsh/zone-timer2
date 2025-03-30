@@ -21,6 +21,7 @@ export default {
 		extend: {
 			opacity: {
 				'3': '0.03',
+				'6': '0.06',
 			},
 			fontFamily: {
 				sans: ['Montserrat', 'sans-serif'],

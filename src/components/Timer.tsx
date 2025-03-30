@@ -7,6 +7,7 @@ import { PlayCircle, PauseCircle, SkipForward, RefreshCw, Edit } from "lucide-re
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import TaskCompletion from "@/components/TaskCompletion";
 
 const Timer: React.FC = () => {
   const {
@@ -153,7 +154,7 @@ const Timer: React.FC = () => {
             />
             <Button
               onClick={handleSaveTask}
-              className="bg-white/20 hover:bg-black/3 text-white p-4 h-12 rounded-2xl"
+              className="bg-white/20 hover:bg-white/10 text-white timer-btn-hover p-4 h-12 rounded-2xl"
             >
               Save
             </Button>
@@ -176,10 +177,10 @@ const Timer: React.FC = () => {
         <Button
           variant={mode === "work" ? "default" : "outline"}
           className={cn(
-            "py-6 px-8 rounded-full text-lg font-medium transition-all duration-300",
+            "py-6 px-8 rounded-full text-lg font-medium transition-all duration-300 timer-btn-hover",
             mode === "work" 
               ? "bg-white/20 text-white shadow-lg scale-110 border-0" 
-              : "bg-white/10 text-white hover:bg-white/20 border-0 hover:border-0 hover:text-white"
+              : "bg-white/10 text-white hover:bg-white/10 border-0 hover:border-0 hover:text-white"
           )}
           onClick={switchToWork}
           disabled={mode === "work" || !currentTask.trim()}
@@ -189,10 +190,10 @@ const Timer: React.FC = () => {
         <Button
           variant={mode === "break" ? "default" : "outline"}
           className={cn(
-            "py-6 px-8 rounded-full text-lg font-medium transition-all duration-300",
+            "py-6 px-8 rounded-full text-lg font-medium transition-all duration-300 timer-btn-hover",
             mode === "break" 
               ? "bg-white/20 text-white shadow-lg scale-110 border-0" 
-              : "bg-white/10 text-white hover:bg-white/20 border-0 hover:border-0 hover:text-white"
+              : "bg-white/10 text-white hover:bg-white/10 border-0 hover:border-0 hover:text-white"
           )}
           onClick={handleSwitchToBreak}
           disabled={mode === "break" || !currentTask.trim()}
@@ -222,14 +223,14 @@ const Timer: React.FC = () => {
               {isRunning ? (
                 <Button
                   onClick={pauseTimer}
-                  className="bg-white/20 hover:bg-black/3 text-white rounded-full w-16 h-16"
+                  className="bg-white/20 hover:bg-white/10 text-white timer-btn-hover rounded-full w-16 h-16"
                 >
                   <PauseCircle className="w-10 h-10" />
                 </Button>
               ) : (
                 <Button
                   onClick={startTimer}
-                  className="bg-white/20 hover:bg-black/3 text-white rounded-full w-16 h-16"
+                  className="bg-white/20 hover:bg-white/10 text-white timer-btn-hover rounded-full w-16 h-16"
                 >
                   <PlayCircle className="w-10 h-10" />
                 </Button>
@@ -247,7 +248,7 @@ const Timer: React.FC = () => {
               <TooltipTrigger asChild>
                 <Button
                   onClick={handleSwitchToBreak}
-                  className="bg-white/20 hover:bg-black/3 text-white rounded-full w-16 h-16"
+                  className="bg-white/20 hover:bg-white/10 text-white timer-btn-hover rounded-full w-16 h-16"
                 >
                   <SkipForward className="w-8 h-8" />
                 </Button>
@@ -264,7 +265,7 @@ const Timer: React.FC = () => {
             <TooltipTrigger asChild>
               <Button
                 onClick={resetTimer}
-                className="bg-white/20 hover:bg-black/3 text-white rounded-full w-16 h-16"
+                className="bg-white/20 hover:bg-white/10 text-white timer-btn-hover rounded-full w-16 h-16"
               >
                 <RefreshCw className="w-8 h-8" />
               </Button>
@@ -274,6 +275,8 @@ const Timer: React.FC = () => {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+
+        <TaskCompletion />
       </div>
     </div>
   );
