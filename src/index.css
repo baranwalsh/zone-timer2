@@ -105,6 +105,7 @@
     background-size: cover;
     background-position: center;
     transition: background-image 1.5s ease-in-out;
+    position: relative;
   }
   
   .break-gradient {
@@ -112,6 +113,7 @@
     background-size: cover;
     background-position: center;
     transition: background-image 1.5s ease-in-out;
+    position: relative;
   }
   
   .neutral-gradient {
@@ -120,6 +122,7 @@
     background-position: center;
     filter: saturate(1.35) brightness(0.92);
     transition: background-image 1.5s ease-in-out;
+    position: relative;
   }
   
   .navbar-shadow {
@@ -213,6 +216,8 @@
   
   .bg-theme-fade {
     transition: opacity 1s ease-in-out, background-image 1s ease-in-out;
+    position: fixed;
+    z-index: -1;
   }
 
   .theme-fade-in {
@@ -272,12 +277,6 @@
     opacity: 0;
     transform: translateY(10px);
   }
-}
-
-/* Add fade transition for themes */
-.theme-transition {
-  transition: opacity 0.5s ease-in-out, background-image 0.5s ease-in-out;
-  z-index: -1;
 }
 
 /* Ensure the video stays in the background */
@@ -382,6 +381,8 @@ input:focus {
   height: 100vh;
   overflow: hidden;
   transition: background 1.5s ease-in-out;
+  position: relative;
+  z-index: 1;
 }
 
 .btn-transition {

@@ -4,57 +4,42 @@ import { Button } from "@/components/ui/button";
 import { Diamond, X, ChevronUp, ChevronDown, ArrowRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTimer } from "@/contexts/TimerContext";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type Theme = {
   id: number;
   url: string;
-  title: string;
 };
 
 const themes: Theme[] = [
   {
     id: 1,
     url: "https://wallpaperaccess.com/full/345256.jpg",
-    title: "Mountain Sunset"
   },
   {
     id: 2,
     url: "https://wallpaperaccess.com/full/345168.jpg",
-    title: "Aurora Borealis"
   },
   {
     id: 3,
     url: "https://wallpaperaccess.com/full/30119.png",
-    title: "Purple Fantasy"
   },
   {
     id: 4,
     url: "https://wallpaperaccess.com/full/345367.jpg",
-    title: "Snow Mountain"
   },
   {
     id: 5,
     url: "https://img.freepik.com/free-photo/japan-background-digital-art_23-2151546139.jpg",
-    title: "Digital Japan"
   },
   {
     id: 6,
     url: "https://img.freepik.com/free-photo/cityscape-anime-inspired-urban-area_23-2151028678.jpg",
-    title: "Anime Cityscape"
   },
   {
     id: 7,
     url: "https://wallpaperaccess.com/full/345388.jpg",
-    title: "Nature Forest"
   }
 ];
 
@@ -198,6 +183,15 @@ const ThemeSelector: React.FC = () => {
               onTouchStart={handleDragStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleDragEnd}
+              onMouseDown={handleDragStart}
+              onMouseMove={(e) => {
+                if (isDragging.current && carouselRef.current) {
+                  e.preventDefault();
+                  carouselRef.current.scrollTop -= e.movementY;
+                }
+              }}
+              onMouseUp={handleDragEnd}
+              onMouseLeave={handleDragEnd}
             >
               <div className="space-y-3 pr-2">
                 {themes.map((theme) => (
@@ -209,8 +203,6 @@ const ThemeSelector: React.FC = () => {
                     )}
                     onMouseEnter={() => handleMouseEnter(theme.id)}
                     onMouseLeave={handleMouseLeave}
-                    onMouseDown={handleDragStart}
-                    onMouseUp={handleDragEnd}
                   >
                     <img 
                       src={theme.url} 
@@ -270,7 +262,7 @@ const ThemeSelector: React.FC = () => {
       </AnimatePresence>
 
       {activeTheme && (
-        <div className="fixed inset-0 pointer-events-none z-0 bg-theme-fade transition-opacity duration-1000">
+        <div className="fixed inset-0 pointer-events-none z-[-1] bg-theme-fade">
           <img 
             src={activeTheme.url} 
             alt=""

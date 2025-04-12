@@ -155,7 +155,7 @@ const TimerApp: React.FC = () => {
         <DateTime />
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center p-6 cascade-fade-in">
+      <main className="flex-1 flex flex-col items-center justify-center p-6 cascade-fade-in z-10">
         <Timer />
       </main>
 
